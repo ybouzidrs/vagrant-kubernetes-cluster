@@ -5,9 +5,8 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 Vagrant.configure(2) do |config|
 
-  #config.vm.provision "shell", path: "bootstrap.sh"
 
-  # Kubernetes Master Server
+  # Kubernetes Controlplane Server
   config.vm.define "controlplane" do |controlplane|
     controlplane.vm.box = "centos/7"
     controlplane.vm.hostname = "controlplane.example.com"
@@ -17,7 +16,6 @@ Vagrant.configure(2) do |config|
       v.memory = 2048
       v.cpus = 2
     end
-    #controlplane.vm.provision "shell", path: "bootstrap_controlplane.sh"
     controlplane.vm.provision "docker-setup", type: "file", source: "./scripts/setup-container.sh", destination: "~/setup-container.sh"
     controlplane.vm.provision "kubetools-setup", type: "file", source: "./scripts/setup-kubetools.sh", destination: "~/setup-kubetools.sh"
     controlplane.vm.provision "inline", type: "shell", inline: <<-SHELL
@@ -26,7 +24,6 @@ Vagrant.configure(2) do |config|
     ./setup-container.sh
     ./setup-kubetools.sh
     SHELL
-
   end
 
   NodeCount = 3
@@ -42,7 +39,6 @@ Vagrant.configure(2) do |config|
         v.memory = 1024
         v.cpus = 1
       end
-      #workernode.vm.provision "shell", path: "bootstrap_worker.sh"
       workernode.vm.provision "docker-setup", type: "file", source: "./scripts/setup-container.sh", destination: "~/setup-container.sh"
       workernode.vm.provision "kubetools-setup", type: "file", source: "./scripts/setup-kubetools.sh", destination: "~/setup-kubetools.sh"
       workernode.vm.provision "worker-inline", type: "shell", inline: <<-SHELL
@@ -53,5 +49,4 @@ Vagrant.configure(2) do |config|
       SHELL
     end
   end
-
 end
